@@ -16,7 +16,6 @@ class Home_VC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       // myScrollview.contentSize = CGSize(width: myScrollview.frame.size.width, height: 2000)
         myTableView.delegate = self
         myTableView.dataSource = self
     }
@@ -37,7 +36,6 @@ extension Home_VC: UITableViewDataSource
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell : MyCustomTableViewCell = tableView.dequeueReusableCell(withIdentifier: "myCellID", for: indexPath) as! MyCustomTableViewCell
         
-        //cell.title.text = "Name of List"
         cell.title.text = listNames[indexPath.row]
         cell.numItems.text = "# Items"
         return cell
