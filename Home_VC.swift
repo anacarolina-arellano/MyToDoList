@@ -11,8 +11,9 @@ class Home_VC: UIViewController {
 
     //@IBOutlet weak var myScrollview : UIScrollView!
     @IBOutlet weak var myTableView : UITableView!
+    @IBOutlet weak var myButtonAddCell : UIButton!
     
-    var listNames = ["Tap Here","iOS Assignment", "Project Dev to-do", "Shopping list", "Extras"]
+    var listNames = ["Tap Here","iOS Assignment", "Project Dev to-do", "Shopping list"]
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,6 +25,33 @@ class Home_VC: UIViewController {
     @IBAction func goBack(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
+    func AddNewCell(title : String){
+        listNames.append(title)
+        myTableView.beginUpdates()
+        myTableView.insertRows(at: [IndexPath(row: listNames.count - 1, section: 0)], with: .automatic)
+        myTableView.endUpdates()
+    }
+    @IBAction func callAlert(_ sender: Any) {
+        let myAlert = UIAlertController(title: "Enter Title", message: "Enter title of the new list", preferredStyle: .alert)
+        
+        myAlert.addTextField{(thisTitle) in
+            thisTitle.textAlignment = .center
+            thisTitle.font = .systemFont(ofSize: 16)
+            thisTitle.isSecureTextEntry = false
+        }
+         
+        let okAction = UIAlertAction(title: "Ok", style: .default){
+            (myAlertAction) in
+            let newTitle = myAlert.textFields![0].text!
+            self.AddNewCell(title: newTitle)
+        }
+        
+        myAlert.addAction(okAction)
+        myAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
 }
 
 extension Home_VC: UITableViewDataSource
