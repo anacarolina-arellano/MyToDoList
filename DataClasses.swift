@@ -8,11 +8,18 @@
 import Foundation
 
 class Group {
-    var items: [Item] = []
+    var items: Array<Item> = Array()
     var name: String?
+    init(name: String, items: Array<Item>) {
+        self.name = name
+        self.items = items
+    }
 }
 
 class Item{
     var name: String?
     var completed: Bool =  false
+    init(name: String) {
+        self.name = name
+    }
 }

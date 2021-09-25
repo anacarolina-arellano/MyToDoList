@@ -11,17 +11,24 @@ class Items_VC: UIViewController, UITableViewDelegate {
 
     @IBOutlet weak var myTableView : UITableView!
     @IBOutlet weak var myButtonAddCell : UIButton!
-    var itemNames = ["Task 1","Task 2", "Task 3"]
+    @IBOutlet weak var myLabel : UILabel!
+    
+    var sentText : String = ""
+    var items: Array<Item> = Array()
+    //public var itemNames = ["Task 1","Task 2", "Task 3"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         myTableView.delegate = self
         myTableView.dataSource = self
+        myLabel.text = sentText
     }
     
     func AddNewCell(title : String){
-        itemNames.append(title)
+        var newItem = Item(name: title)
+        items.append(newItem)
         myTableView.beginUpdates()
-        myTableView.insertRows(at: [IndexPath(row: itemNames.count - 1, section: 0)], with: .automatic)
+        myTableView.insertRows(at: [IndexPath(row: items.count - 1, section: 0)], with: .automatic)
         myTableView.endUpdates()
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -53,7 +60,7 @@ class Items_VC: UIViewController, UITableViewDelegate {
 extension Items_VC: UITableViewDataSource
 {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemNames.count
+        return items.count
     
     }
     
@@ -61,7 +68,8 @@ extension Items_VC: UITableViewDataSource
         let cell : MyItemsTableViewCell = tableView.dequeueReusableCell(withIdentifier: "myItemCell", for: indexPath) as! MyItemsTableViewCell
         
         //cell.title.text = "Name of List"
-        cell.title.text = itemNames[indexPath.row]
+        cell.title.text = items[indexPath.row].name
+        cell.completedImage.image = UIImage(named: "greenNwhite")
         return cell
     }
 }

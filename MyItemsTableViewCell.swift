@@ -10,7 +10,7 @@ import UIKit
 class MyItemsTableViewCell: UITableViewCell {
 
     @IBOutlet weak var title: UILabel!
-    @IBOutlet weak var completed: UISwitch!
+    @IBOutlet weak var completedImage: UIImageView!
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

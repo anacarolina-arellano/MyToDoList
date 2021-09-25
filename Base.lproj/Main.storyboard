@@ -107,7 +107,7 @@
                                         <connections>
                                             <outlet property="numItems" destination="mBw-Ek-EI7" id="7Oy-CJ-Cna"/>
                                             <outlet property="title" destination="LTk-Wp-ivr" id="yHx-xE-N8S"/>
-                                            <segue destination="Fig-Ig-jRx" kind="show" id="lRD-1k-4lq"/>
+                                            <segue destination="Fig-Ig-jRx" kind="show" identifier="ToItems" id="lRD-1k-4lq"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -193,24 +193,21 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dFh-UM-CMe">
-                                                    <rect key="frame" x="285" y="34" width="51" height="31"/>
-                                                </switch>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pll-7g-IFO">
+                                                    <rect key="frame" x="272" y="23" width="45" height="45"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="dFh-UM-CMe" secondAttribute="trailing" constant="32" id="55k-eJ-Xx1"/>
                                                 <constraint firstItem="xsA-H3-UcN" firstAttribute="leading" secondItem="zce-Jx-QCO" secondAttribute="leading" constant="20" symbolic="YES" id="C0n-cN-VLT"/>
                                                 <constraint firstAttribute="trailing" secondItem="xsA-H3-UcN" secondAttribute="trailing" constant="20" id="SX2-WJ-teb"/>
                                                 <constraint firstItem="xsA-H3-UcN" firstAttribute="top" secondItem="zce-Jx-QCO" secondAttribute="top" constant="23" id="WlR-0y-ivx"/>
                                                 <constraint firstAttribute="bottom" secondItem="xsA-H3-UcN" secondAttribute="bottom" constant="24" id="ZGY-Gw-mm5"/>
-                                                <constraint firstItem="dFh-UM-CMe" firstAttribute="top" secondItem="zce-Jx-QCO" secondAttribute="top" constant="34" id="eM8-3s-9Pa"/>
-                                                <constraint firstAttribute="bottom" secondItem="dFh-UM-CMe" secondAttribute="bottom" constant="35" id="ugU-kt-vi8"/>
-                                                <constraint firstItem="dFh-UM-CMe" firstAttribute="leading" secondItem="zce-Jx-QCO" secondAttribute="leading" constant="285" id="zqT-rQ-JrI"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" systemColor="systemTealColor"/>
                                         <connections>
-                                            <outlet property="completed" destination="dFh-UM-CMe" id="d1p-sR-EVU"/>
+                                            <outlet property="completedImage" destination="pll-7g-IFO" id="uF8-Ix-FIT"/>
                                             <outlet property="title" destination="xsA-H3-UcN" id="hwJ-xg-0jZ"/>
                                         </connections>
                                     </tableViewCell>
@@ -248,12 +245,13 @@
                     <navigationItem key="navigationItem" id="3rA-Zo-yiH"/>
                     <connections>
                         <outlet property="myButtonAddCell" destination="DYg-dY-IFf" id="z4L-ng-7XX"/>
+                        <outlet property="myLabel" destination="ViH-DU-396" id="Mye-RG-Jbf"/>
                         <outlet property="myTableView" destination="XpA-TO-6iq" id="Ok0-ww-OKR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sbl-Pr-eLB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2528" y="78"/>
+            <point key="canvasLocation" x="2527.536231884058" y="77.678571428571431"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="KFp-ho-kE0">

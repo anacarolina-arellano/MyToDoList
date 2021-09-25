@@ -9,26 +9,46 @@ import UIKit
 
 class Home_VC: UIViewController {
 
-    //@IBOutlet weak var myScrollview : UIScrollView!
     @IBOutlet weak var myTableView : UITableView!
     @IBOutlet weak var myButtonAddCell : UIButton!
-    
-    var listNames = ["Tap Here","iOS Assignment", "Project Dev to-do", "Shopping list"]
+    var lastClicked = 0;
+    //var listNames = ["Tap Here","iOS Assignment", "Project Dev to-do", "Shopping list"]
+    var lists : Array<Group> = Array()
     override func viewDidLoad() {
         super.viewDidLoad()
         
         myTableView.delegate = self
         myTableView.dataSource = self
-    }
+        
+        //create place holder data
+        let itemOne = Item(name: "Task1, List 1")
+        let itemTwo = Item(name: "Task2, List 1")
+        let itemOneL2 = Item(name: "Task1, List 2")
+        let itemTwoL2 = Item(name: "Task2, List 2")
+        let itemOneL3 = Item(name: "Task1, List 3")
+        let itemTwoL3 = Item(name: "Task2, List 3")
+        let itemThreeL3 = Item(name: "Task3, List 3")
+        let itemFourL3 = Item(name: "Task4, List 3")
+        let myItemsArray = [itemOne, itemTwo]
+        let myItemsArrayL2 = [itemOneL2, itemTwoL2]
+        let myItemsArrayL3 = [itemOneL3, itemTwoL3, itemThreeL3, itemFourL3]
 
+        lists.append(Group(name: "Tap Here", items: myItemsArray))
+        lists.append(Group(name: "iOS Assignment", items: myItemsArrayL2))
+        lists.append(Group(name: "Project dev", items: myItemsArrayL3))
+        
+    }
+    
 
     @IBAction func goBack(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
     func AddNewCell(title : String){
-        listNames.append(title)
+        let tempItems : Array<Item> = Array()
+        let newGroup = Group(name: title, items: tempItems)
+        lists.append(newGroup)
         myTableView.beginUpdates()
-        myTableView.insertRows(at: [IndexPath(row: listNames.count - 1, section: 0)], with: .automatic)
+        myTableView.insertRows(at: [IndexPath(row: lists.count - 1, section: 0)], with: .automatic)
         myTableView.endUpdates()
     }
     @IBAction func callAlert(_ sender: Any) {
@@ -52,20 +72,35 @@ class Home_VC: UIViewController {
         self.present(myAlert, animated: true, completion: nil)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if(segue.identifier == "ToItems")
+        {
+            let controller = segue.destination as! Items_VC
+            let indexPath = sender as! MyCustomTableViewCell
+            controller.sentText = indexPath.title.text!
+            
+            for list in lists{
+                if list.name == indexPath.title.text!
+                {
+                    controller.items = list.items
+                }
+            }
+        }
+    }
 }
 
 extension Home_VC: UITableViewDataSource
 {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listNames.count
+        return lists.count
     
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell : MyCustomTableViewCell = tableView.dequeueReusableCell(withIdentifier: "myCellID", for: indexPath) as! MyCustomTableViewCell
         
-        cell.title.text = listNames[indexPath.row]
-        cell.numItems.text = "# Items"
+        cell.title.text = lists[indexPath.row].name
+        cell.numItems.text = "\(String(lists[indexPath.row].items.count)) items"
         return cell
     }
 }
@@ -74,10 +109,10 @@ extension Home_VC: UITableViewDataSource
 extension Home_VC: UITableViewDelegate
 {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        lastClicked = indexPath.row
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-   
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
@@ -86,12 +121,12 @@ extension Home_VC: UITableViewDelegate
         
         if(editingStyle == .delete)
         {
-            listNames.remove(at: indexPath.row)
+            lists.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.left)
         }
     }
     
     func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
-        return "Delete \(listNames[indexPath.row])?"
+        return "Delete \(lists[indexPath.row])?"
     }
 }
