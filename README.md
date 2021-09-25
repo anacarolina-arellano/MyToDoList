@@ -1,7 +1,7 @@
-### **PG20 T5 Mobile - iOS - A1:  Todo App UI**
+### **PG20 T5 Mobile - iOS - A2:  A2: Todo App Impersistence**
 By: Ana Carolina Arellano Alvarez
 
-- This project contains the UI designed for the Todo List application, functionalities and persistance is going to be developed for the next deliveries
+- This project contains the UI designed for the Todo List application, it also implements the functionalities of adding new lists, new tasks to the lists, deleting lists, checking items as completed/incompleye. Persistance is going to be developed for the next deliveries
 
 #### **Download/Install**
 ---------
