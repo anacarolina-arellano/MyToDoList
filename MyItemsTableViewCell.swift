@@ -15,5 +15,5 @@ class MyItemsTableViewCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
     }
-
+   
 }
