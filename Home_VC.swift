@@ -6,7 +6,8 @@
 //
 
 import UIKit
-
+let notificatonKey = "notifyChange"
+let notificatonKeyCompletedItem = "notifyItemCompleted"
 class Home_VC: UIViewController {
 
     @IBOutlet weak var myTableView : UITableView!
@@ -19,34 +20,87 @@ class Home_VC: UIViewController {
         myTableView.delegate = self
         myTableView.dataSource = self
         
-        //create placeholder data
-        let itemOne = Item(name: "Task1, List 1")
-        var itemTwo = Item(name: "Task2, List 1")
-        itemTwo.completed = true;
-        let itemOneL2 = Item(name: "Task1, List 2")
-        let itemTwoL2 = Item(name: "Task2, List 2")
-        let itemOneL3 = Item(name: "Task1, List 3")
-        let itemTwoL3 = Item(name: "Task2, List 3")
-        let itemThreeL3 = Item(name: "Task3, List 3")
-        var itemFourL3 = Item(name: "Task4, List 3")
-        itemFourL3.completed = true;
-        let myItemsArray = [itemOne, itemTwo]
-        let myItemsArrayL2 = [itemOneL2, itemTwoL2]
-        let myItemsArrayL3 = [itemOneL3, itemTwoL3, itemThreeL3, itemFourL3]
-
-        //add placeholder data to array
-        lists.append(Group(name: "Tap Here", items: myItemsArray))
-        lists.append(Group(name: "iOS Assignment", items: myItemsArrayL2))
-        lists.append(Group(name: "Project dev", items: myItemsArrayL3))
+        //Set observer used to get new items
+        NotificationCenter.default.addObserver(self,selector: #selector(ReceiveItem(_:)), name: Notification.Name(rawValue: notificatonKey), object: nil)
+        //Set observer used to change completed status
+        NotificationCenter.default.addObserver(self,selector: #selector(UpdateItem(_:)), name: Notification.Name(rawValue: notificatonKeyCompletedItem), object: nil)
+        //read file
+        read()
         
     }
     
+    //Get newly added item
+    @objc func ReceiveItem(_ notification: NSNotification)
+    {
+        if let dict = notification.userInfo as NSDictionary?
+        {
+            if let listName = dict["ListName"] as? String, let itemName = dict["ItemName"] as? String {
+                //find it's list and add it
+                for list in lists
+                {
+                    if list.name == listName
+                    {
+                        list.items.append(Item(name: itemName, completed: false))
+                        //write item in file
+                        write()
+                        myTableView.reloadData()
+                    }
+                }
+            }
+        }
+    }
+    
+    //Modify status of item
+    @objc func UpdateItem(_ notification: NSNotification)
+    {
+        if let dict = notification.userInfo as NSDictionary?
+        {
+            if let listName = dict["ListName"] as? String, let itemName = dict["ItemName"] as? String, let status = dict["ItemStatus"] as? String {
+                //find it's list and add it
+                for list in 0..<lists.count
+                {
+                    if lists[list].name == listName
+                    {
+                        for it in 0..<lists[list].items.count
+                        {
+                            if lists[list].items[it].name == itemName
+                            {
+                                
+                                if(status == "0")
+                                {
+                                    lists[list].items[it].completed = false
+                                }
+                                else{
+                                    lists[list].items[it].completed = true
+                                }
+                                //make change in file
+                                write()
+                                myTableView.reloadData()
+                            }
+                        }
+                    }
+                }
+                // There's probably an easier way to do this search
+            }
+        }
+    }
+    
     //create new cell in table view
-    func AddNewCell(title : String){
-        let tempItems : Array<Item> = Array()
-        let newGroup = Group(name: title, items: tempItems)
+    func AddNewCell(newGroup : Group){
+        print(newGroup.items)
         lists.append(newGroup)
-        //upodate table view
+        
+        //update table view
+        myTableView.beginUpdates()
+        myTableView.insertRows(at: [IndexPath(row: lists.count - 1, section: 0)], with: .automatic)
+        myTableView.endUpdates()
+    }
+    
+    func AddNewCellToDisk(newGroup : Group){
+        print(newGroup)
+        lists.append(newGroup)
+        write()
+        //update table view
         myTableView.beginUpdates()
         myTableView.insertRows(at: [IndexPath(row: lists.count - 1, section: 0)], with: .automatic)
         myTableView.endUpdates()
@@ -67,12 +121,39 @@ class Home_VC: UIViewController {
         let okAction = UIAlertAction(title: "Ok", style: .default){
             (myAlertAction) in
             let newTitle = myAlert.textFields![0].text!
-            self.AddNewCell(title: newTitle)
+            var exists = false
+            //check if a list with that name already exists
+            for list in self.lists
+            {
+                if list.name == newTitle
+                {
+                    exists = true
+                }
+            }
+            if !exists
+            {
+                self.AddNewCellToDisk(newGroup: Group(name: newTitle, items: []))
+            }
+            else
+            {
+                self.callErrorAlert()
+            }
+            
         }
         
         myAlert.addAction(okAction)
         myAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
+    //create alert for error
+    @IBAction func callErrorAlert() {
+        let myAlert = UIAlertController(title: "Existing List", message: "A list with that name already exists.", preferredStyle: .alert)
+                 
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        
+        myAlert.addAction(okAction)
         self.present(myAlert, animated: true, completion: nil)
     }
     
@@ -91,6 +172,57 @@ class Home_VC: UIViewController {
                     controller.items = list.items
                 }
             }
+        }
+    }
+    
+    //read data from disk
+    func read()
+    {
+        if let file = getFile()
+        {
+            if let data = try? Data(contentsOf: file)
+            {
+                do
+                {
+                    let foundLists = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [Group]
+                    for list in foundLists!
+                    {
+                        self.AddNewCell(newGroup: Group(name: list.name!, items: list.items))
+                    }
+                } catch{
+                    
+                }
+            }
+        }
+        
+    }
+    
+    //write data from disk
+    func write()
+    {
+        //let dataString = lists.joined(separator:"\n")
+        if let file = getFile()
+        {
+            print(file)
+            let archiver = try? NSKeyedArchiver.archivedData(withRootObject: lists, requiringSecureCoding: false)
+            
+            try? archiver?.write(to: file)
+        }
+    }
+    
+    //get file
+    func getFile() -> URL?
+    {
+        let fileManager = FileManager.default
+        
+        do
+        {
+            let myDocument = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+
+            return myDocument.appendingPathComponent("TestDta.txt")
+            
+        } catch{
+           return nil
         }
     }
 }
@@ -131,6 +263,7 @@ extension Home_VC: UITableViewDelegate
         {
             lists.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.left)
+            write()
         }
     }
     

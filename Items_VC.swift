@@ -8,13 +8,13 @@
 import UIKit
 
 class Items_VC: UIViewController, UITableViewDelegate {
-
+        
     @IBOutlet weak var myTableView : UITableView!
     @IBOutlet weak var myButtonAddCell : UIButton!
     @IBOutlet weak var myLabel : UILabel!
     
     var sentText : String = ""
-    var items: Array<Item> = Array()
+    var items: [Item] = [] 
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,13 @@ class Items_VC: UIViewController, UITableViewDelegate {
     
     //create new cell and update table view
     func AddNewCell(title : String){
-        items.append(Item(name: title))
+        items.append(Item(name: title, completed: false))
+        var newItem = [String : String]()
+        newItem["ListName"] = sentText
+        newItem["ItemName"] = title
+        
+        //send notification of item added
+        NotificationCenter.default.post(name: Notification.Name(rawValue: notificatonKey), object: nil, userInfo: newItem)
         myTableView.beginUpdates()
         myTableView.insertRows(at: [IndexPath(row: items.count - 1, section: 0)], with: .automatic)
         myTableView.endUpdates()
@@ -51,15 +57,54 @@ class Items_VC: UIViewController, UITableViewDelegate {
         let okAction = UIAlertAction(title: "Ok", style: .default){
             (myAlertAction) in
             let newTitle = myAlert.textFields![0].text!
-            self.AddNewCell(title: newTitle)
+            var exists = false
+            for item in self.items
+            {
+                if item.name == newTitle
+                {
+                    exists = true
+                }
+            }
+            if !exists
+            {
+                self.AddNewCell(title: newTitle)
+            }
+            else
+            {
+                self.callErrorAlert()
+            }
+            
         }
-        
         myAlert.addAction(okAction)
         myAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         self.present(myAlert, animated: true, completion: nil)
     }
-
+    
+    //create alert for error
+    @IBAction func callErrorAlert() {
+        let myAlert = UIAlertController(title: "Existing List", message: "A list with that name already exists.", preferredStyle: .alert)
+                 
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        
+        myAlert.addAction(okAction)
+        self.present(myAlert, animated: true, completion: nil)
+    }
+    
+    //allow user to delete item
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if(editingStyle == .delete)
+        {
+            items.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: UITableView.RowAnimation.left)
+        }
+    }
+    
+    //show message to user when trying to delete a row
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Delete \(items[indexPath.row].name)?"
+    }
 }
 
 extension Items_VC: UITableViewDataSource
@@ -96,9 +141,15 @@ extension Items_VC: UITableViewDataSource
         
         items[numRow].completed = !items[numRow].completed
 
+        var changedItem = [String : String]()
+        changedItem["ListName"] = sentText
+        changedItem["ItemName"] = items[numRow].name
+        changedItem["ItemStatus"] = String(items[numRow].completed)
+        
+        //send notification of item status changed
+        NotificationCenter.default.post(name: Notification.Name(rawValue: notificatonKeyCompletedItem), object: nil, userInfo: changedItem)
         myTableView.beginUpdates()
         myTableView.reloadRows(at: [IndexPath(row: Int(numRow), section: 0)], with: .automatic)
         myTableView.endUpdates()
     }
-   
 }
